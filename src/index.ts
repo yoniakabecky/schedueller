@@ -1,7 +1,9 @@
 import "reflect-metadata";
-import express from "express";
 import { ApolloServer } from "apollo-server-express";
+import express from "express";
+import { buildSchema } from "type-graphql";
 import { createConnection } from "typeorm";
+import resolvers from "./resolvers";
 
 const main = async () => {
   const app = express();
@@ -11,22 +13,13 @@ const main = async () => {
   await createConnection();
 
   const apolloServer = new ApolloServer({
-    typeDefs: `
-      type Query {
-        hello: String!
-      }
-    `,
-    resolvers: {
-      Query: {
-        hello: () => "hello world",
-      }
-    }
+    schema: await buildSchema({ resolvers })
   })
 
   apolloServer.applyMiddleware({ app });
 
   app.listen(4000, () => {
-    console.log("express server started 🚀")
+    console.log("server started 🚀 http://localhost:4000/graphql")
   })
 };
 
