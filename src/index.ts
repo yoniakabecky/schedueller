@@ -8,8 +8,6 @@ import resolvers from "./resolvers";
 const main = async () => {
   const app = express();
 
-  app.get("/", (_, res) => res.send("hello"));
-
   await createConnection();
 
   const apolloServer = new ApolloServer({
