@@ -1,19 +1,19 @@
 import { UserInputError } from "apollo-server-express";
 import bcrypt from "bcrypt";
 import { Arg, Mutation, Query, Resolver } from "type-graphql";
-import { Company } from "../entity/Company";
-import { SignupInput, User } from "../entity/User";
+import { Company, CompanySignupInput } from "../entity/Company";
+import { User } from "../entity/User";
 
 @Resolver()
-export class UserResolver {
-  @Query(() => [User])
-  users() {
-    return User.find();
+export class CompanyResolver {
+  @Query(() => [Company])
+  companies() {
+    return Company.find();
   }
 
   @Mutation(() => Boolean)
-  async signup(
-    @Arg("data") { email, userName, password, confirmPassword }: SignupInput
+  async companySignup(
+    @Arg("data") { email, companyName, password, confirmPassword }: CompanySignupInput
   ) {
     try {
       const companyAccount = await Company.findOne({ email });
@@ -24,9 +24,9 @@ export class UserResolver {
 
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      await User.insert({
+      await Company.insert({
         email,
-        userName,
+        companyName,
         password: hashedPassword
       });
 
