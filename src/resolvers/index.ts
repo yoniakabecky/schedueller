@@ -1,7 +1,10 @@
+import { AccountResolver } from "./accountResolver";
 import { CompanyResolver } from "./companyResolver";
 import { UserResolver } from "./userResolver";
 
+
 export default [
-  UserResolver,
-  CompanyResolver
+  AccountResolver,
+  CompanyResolver,
+  UserResolver
 ] as const;
