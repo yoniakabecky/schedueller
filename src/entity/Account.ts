@@ -13,6 +13,7 @@ export class Account extends BaseEntity {
   @Column()
   email: string;
 
+  @Column()
   password: string;
 
   @Field()
@@ -55,4 +56,13 @@ export class SignupInput extends SigninInput {
   @IsNotEmpty()
   @MinLength(2, { message: "userName has to be longer than $constraint1 characters" })
   name: string;
+}
+
+@ObjectType()
+export class LoginResponse {
+  @Field()
+  token: string;
+
+  @Field()
+  accountId: string;
 }
