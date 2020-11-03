@@ -1,8 +1,6 @@
-import { UserInputError } from "apollo-server-express";
-import bcrypt from "bcrypt";
-import { Arg, Mutation, Query, Resolver } from "type-graphql";
-import { Company, CompanySignupInput } from "../entity/Company";
-import { User } from "../entity/User";
+import { ObjectId } from "mongodb";
+import { Arg, Query, Resolver } from "type-graphql";
+import { Company } from "../entity/Company";
 
 @Resolver()
 export class CompanyResolver {
@@ -11,30 +9,16 @@ export class CompanyResolver {
     return Company.find();
   }
 
-  @Mutation(() => Boolean)
-  async companySignup(
-    @Arg("data") { email, companyName, password, confirmPassword }: CompanySignupInput
-  ) {
+  @Query(() => Company)
+  async getCompany(@Arg("accountId") accountId: string) {
     try {
-      const companyAccount = await Company.findOne({ email });
-      const userAccount = await User.findOne({ email });
-      if (companyAccount || userAccount) throw new UserInputError('Email is already in use');
+      const company = await Company.findOne({ accountId: new ObjectId(accountId) });
+      if (!company) throw new Error('Company not found');
 
-      if (password !== confirmPassword) throw new UserInputError('Password must be same');
-
-      const hashedPassword = await bcrypt.hash(password, 10);
-
-      await Company.insert({
-        email,
-        companyName,
-        password: hashedPassword
-      });
-
-    } catch (err) {
-      console.error(err);
-      return err;
+      return company;
+    } catch (error) {
+      console.error(error);
+      return error;
     }
-
-    return true;
   }
 }

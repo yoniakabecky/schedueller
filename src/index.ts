@@ -11,7 +11,8 @@ const main = async () => {
   await createConnection();
 
   const apolloServer = new ApolloServer({
-    schema: await buildSchema({ resolvers })
+    schema: await buildSchema({ resolvers }),
+    context: ({ req, res }) => ({ req, res }),
   })
 
   apolloServer.applyMiddleware({ app });
