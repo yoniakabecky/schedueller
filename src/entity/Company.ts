@@ -1,3 +1,4 @@
+import { ObjectID } from "mongodb";
 import { Field, ID, ObjectType } from "type-graphql";
 import { BaseEntity, Column, Entity, ObjectIdColumn } from "typeorm";
 
@@ -6,11 +7,11 @@ import { BaseEntity, Column, Entity, ObjectIdColumn } from "typeorm";
 export class Company extends BaseEntity {
   @Field(() => ID)
   @ObjectIdColumn()
-  id: number;
+  id: ObjectID;
 
   @Field(() => ID)
   @Column()
-  accountId: string;
+  accountId: ObjectID;
 
   @Field()
   @Column()

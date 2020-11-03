@@ -14,9 +14,10 @@ export class AccountResolver {
     return Account.find();
   }
 
-  @Mutation(() => Boolean)
+  @Mutation(() => LoginResponse)
   async signup(
-    @Arg("data") { email, password, confirmPassword, isCompany, name }: SignupInput
+    @Arg("data") { email, password, confirmPassword, isCompany, name }: SignupInput,
+    @Ctx() { res }: MyContext
   ) {
     try {
       const isAccountExist = await Account.findOne({ email });
@@ -24,26 +25,34 @@ export class AccountResolver {
       if (password !== confirmPassword) throw new UserInputError("Password must be same");
 
       const hashedPassword = await bcrypt.hash(password, 10);
+
       const newAccount = await Account.insert({
         email,
         isCompany,
         password: hashedPassword
       });
 
+      const newAccountId = newAccount.raw.insertedId;
+
       if (isCompany) {
         await Company.insert({
           companyName: name,
-          accountId: newAccount.identifiers[0].id
+          accountId: newAccountId
         })
       } else {
         await User.insert({
           userName: name,
-          accountId: newAccount.identifiers[0].id
+          accountId: newAccountId
         })
       }
 
-      return true;
+      const token = createAccessToken(newAccountId);
+      res.cookie("jwt", token, { httpOnly: true });
 
+      return {
+        token,
+        accountId: newAccountId
+      };
     } catch (err) {
       console.error(err);
       return err;
@@ -61,7 +70,7 @@ export class AccountResolver {
     const isPasswordValid = await bcrypt.compare(password, account.password);
     if (!isPasswordValid) throw new Error("Wrong password");
 
-    const token = createAccessToken(account);
+    const token = createAccessToken(account.id);
     res.cookie("jwt", token, { httpOnly: true });
 
     return {

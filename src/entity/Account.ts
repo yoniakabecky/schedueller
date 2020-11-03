@@ -1,3 +1,4 @@
+import { ObjectID } from "mongodb";
 import { IsBoolean, IsEmail, IsNotEmpty, MinLength } from "class-validator";
 import { Field, ID, InputType, ObjectType } from "type-graphql";
 import { BaseEntity, Column, Entity, ObjectIdColumn } from "typeorm";
@@ -7,7 +8,7 @@ import { BaseEntity, Column, Entity, ObjectIdColumn } from "typeorm";
 export class Account extends BaseEntity {
   @Field(() => ID)
   @ObjectIdColumn()
-  id: string;
+  id: ObjectID;
 
   @Field()
   @Column()

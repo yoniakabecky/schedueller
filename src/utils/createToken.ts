@@ -1,9 +1,9 @@
 import { sign } from "jsonwebtoken";
-import { Account } from "../entity/Account";
+import { ObjectID } from "mongodb";
 
-export const createAccessToken = (account: Account) => {
+export const createAccessToken = (accountId: ObjectID) => {
   return sign(
-    { id: account.id },
+    { id: accountId },
     process.env.ACCESS_TOKEN_SECRET!,
     { expiresIn: "1d" }
   )
