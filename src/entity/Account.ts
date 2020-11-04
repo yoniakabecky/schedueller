@@ -1,4 +1,4 @@
-import { ObjectID } from "mongodb";
+import { ObjectId } from "mongodb";
 import { IsBoolean, IsEmail, IsNotEmpty, MinLength } from "class-validator";
 import { Field, ID, InputType, ObjectType } from "type-graphql";
 import { BaseEntity, Column, Entity, ObjectIdColumn } from "typeorm";
@@ -8,7 +8,7 @@ import { BaseEntity, Column, Entity, ObjectIdColumn } from "typeorm";
 export class Account extends BaseEntity {
   @Field(() => ID)
   @ObjectIdColumn()
-  id: ObjectID;
+  id: ObjectId;
 
   @Field()
   @Column()
@@ -66,4 +66,17 @@ export class LoginResponse {
 
   @Field()
   accountId: string;
+}
+
+@InputType()
+export class EditAccountInput {
+  @Field({ nullable: true })
+  @IsEmail()
+  email: string;
+
+  @Field({ nullable: true })
+  password: string;
+
+  @Field({ nullable: true })
+  confirmPassword: string;
 }
