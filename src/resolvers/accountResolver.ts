@@ -49,6 +49,41 @@ export class AccountResolver {
     return true;
   }
 
+  @Mutation(() => Boolean)
+  async deleteAccount(
+    @Arg("accountId") accountId: string,
+  ) {
+    try {
+      const account = await Account.findOne({ where: { _id: new ObjectId(accountId) } });
+      if (!account) throw new Error('Account not found');
+
+      await getMongoManager()
+        .findOneAndDelete<Account>(
+          Account,
+          { _id: new ObjectId(accountId) }
+        );
+
+      if (account.isCompany) {
+        await getMongoManager()
+          .findOneAndDelete<Company>(
+            Company,
+            { accountId: new ObjectId(accountId) }
+          );
+      } else {
+        await getMongoManager()
+          .findOneAndDelete<User>(
+            User,
+            { accountId: new ObjectId(accountId) }
+          );
+      }
+    } catch (error) {
+      console.error(error);
+      return error;
+    }
+
+    return true;
+  }
+
   @Mutation(() => LoginResponse)
   async signup(
     @Arg("data") { email, password, confirmPassword, isCompany, name }: SignupInput,
