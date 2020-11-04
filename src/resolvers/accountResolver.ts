@@ -1,7 +1,9 @@
 import { UserInputError } from "apollo-server-express";
 import bcrypt from "bcrypt";
+import { ObjectId } from "mongodb";
 import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
-import { Account, LoginResponse, SigninInput, SignupInput } from "../entity/Account";
+import { getMongoManager } from "typeorm";
+import { Account, EditAccountInput, LoginResponse, SigninInput, SignupInput } from "../entity/Account";
 import { Company } from "../entity/Company";
 import { User } from "../entity/User";
 import { createAccessToken } from "../utils/createToken";
@@ -14,11 +16,44 @@ export class AccountResolver {
     return Account.find();
   }
 
+  @Query(() => Account)
+  async getAccount(@Arg("accountId") accountId: string): Promise<Account> {
+    try {
+      const account = await Account.findOne({ where: { _id: new ObjectId(accountId) } });
+      if (!account) throw new Error('Account not found');
+
+      return account;
+    } catch (error) {
+      console.error(error);
+      return error;
+    }
+  }
+
+  @Mutation(() => Boolean)
+  async editAccount(
+    @Arg("accountId") accountId: string,
+    @Arg("data") data: EditAccountInput
+  ) {
+    try {
+      await getMongoManager()
+        .findOneAndUpdate<Account>(
+          Account,
+          { _id: new ObjectId(accountId) },
+          { $set: { ...data } }
+        );
+    } catch (error) {
+      console.error(error);
+      return error;
+    }
+
+    return true;
+  }
+
   @Mutation(() => LoginResponse)
   async signup(
     @Arg("data") { email, password, confirmPassword, isCompany, name }: SignupInput,
     @Ctx() { res }: MyContext
-  ) {
+  ): Promise<LoginResponse> {
     try {
       const isAccountExist = await Account.findOne({ email });
       if (isAccountExist) throw new UserInputError("Email is already in use");
@@ -32,7 +67,7 @@ export class AccountResolver {
         password: hashedPassword
       });
 
-      const newAccountId = newAccount.raw.insertedId;
+      const newAccountId: ObjectId = newAccount.raw.insertedId;
 
       if (isCompany) {
         await Company.insert({
@@ -51,7 +86,7 @@ export class AccountResolver {
 
       return {
         token,
-        accountId: newAccountId
+        accountId: newAccountId.toHexString()
       };
     } catch (err) {
       console.error(err);
@@ -63,7 +98,7 @@ export class AccountResolver {
   async login(
     @Arg("data") { email, password }: SigninInput,
     @Ctx() { res }: MyContext
-  ) {
+  ): Promise<LoginResponse> {
     const account = await Account.findOne({ email });
     if (!account) throw new Error('Account not found');
 
@@ -75,7 +110,7 @@ export class AccountResolver {
 
     return {
       token,
-      accountId: account.id
+      accountId: account.id.toHexString()
     };
   }
 }

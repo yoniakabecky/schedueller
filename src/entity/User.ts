@@ -1,5 +1,5 @@
-import { ObjectID } from "mongodb";
-import { Field, ID, ObjectType } from "type-graphql";
+import { ObjectId } from "mongodb";
+import { Field, ID, InputType, ObjectType } from "type-graphql";
 import { BaseEntity, Column, Entity, ObjectIdColumn } from "typeorm";
 
 @ObjectType()
@@ -7,11 +7,11 @@ import { BaseEntity, Column, Entity, ObjectIdColumn } from "typeorm";
 export class User extends BaseEntity {
   @Field(() => ID)
   @ObjectIdColumn()
-  id: ObjectID;
+  id: ObjectId;
 
   @Field(() => ID)
   @Column()
-  accountId: ObjectID;
+  accountId: ObjectId;
 
   @Field()
   @Column()
@@ -27,5 +27,20 @@ export class User extends BaseEntity {
 
   @Field({ nullable: true })
   @Column()
+  profileImage: string;
+}
+
+@InputType()
+export class EditUserInput {
+  @Field({ nullable: true })
+  userName: string;
+
+  @Field({ nullable: true })
+  firstName: string;
+
+  @Field({ nullable: true })
+  lastName: string;
+
+  @Field({ nullable: true })
   profileImage: string;
 }
