@@ -14,7 +14,7 @@ export class EmployeeResolver {
   }
 
   @Query(() => [Employee])
-  async getMyEmployment(@Arg("userId") userId: string) {
+  async getMyEmployments(@Arg("userId") userId: string) {
     try {
       return await Employee.find({ where: { userId: new ObjectId(userId) } })
     } catch (error) {
