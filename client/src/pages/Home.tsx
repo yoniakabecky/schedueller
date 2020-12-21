@@ -1,11 +1,9 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { ReactElement } from "react";
+import { Link } from "react-router-dom";
 
-interface Props {
+interface Props {}
 
-}
-
-const Home = (props: Props) => {
+export default function Home(props: Props): ReactElement {
   return (
     <div>
       <h1>Schedueller</h1>
@@ -14,7 +12,5 @@ const Home = (props: Props) => {
       <br />
       <Link to="signup">Signup</Link>
     </div>
-  )
+  );
 }
-
-export default Home

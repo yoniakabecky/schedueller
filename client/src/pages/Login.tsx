@@ -1,13 +1,11 @@
-import React from 'react'
+import React, { ReactElement } from "react";
 
-interface Props {
+interface Props {}
 
-}
-
-const Login = (props: Props) => {
+export default function Login(props: Props): ReactElement {
   const handleSubmit = () => {
-    console.log("submit")
-  }
+    console.log("submit");
+  };
 
   return (
     <div>
@@ -15,16 +13,17 @@ const Login = (props: Props) => {
 
       <form onSubmit={handleSubmit}>
         <label htmlFor="email">Email:</label>
-        <input type="email" id="email" name="email" /><br /><br />
+        <input type="email" id="email" name="email" />
+        <br />
+        <br />
 
         <label htmlFor="password">Password:</label>
-        <input type="password" id="password" name="password" /><br /><br />
+        <input type="password" id="password" name="password" />
+        <br />
+        <br />
 
         <input type="submit" value="Submit" />
       </form>
     </div>
-  )
+  );
 }
-
-export default Login
-
