@@ -1,5 +1,4 @@
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
-import { gql } from "@apollo/client";
 import React from "react";
 import { BrowserRouter } from "react-router-dom";
 
@@ -10,26 +9,7 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
-const GET_USERS = gql`
-  query GetUsers {
-    users {
-      id
-      accountId
-      userName
-      firstName
-      lastName
-      profileImage
-    }
-  }
-`;
-
 function App() {
-  client
-    .query({
-      query: GET_USERS,
-    })
-    .then((result) => console.log(result));
-
   return (
     <ApolloProvider client={client}>
       <BrowserRouter>
