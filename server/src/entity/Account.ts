@@ -31,7 +31,7 @@ export class Account extends BaseEntity {
 }
 
 @InputType()
-export class SigninInput {
+export class LoginInput {
   @Field()
   @IsEmail()
   @IsNotEmpty()
@@ -39,12 +39,14 @@ export class SigninInput {
 
   @Field()
   @IsNotEmpty()
-  @MinLength(5, { message: "password has to be longer than $constraint1 characters" })
+  @MinLength(5, {
+    message: "password has to be longer than $constraint1 characters",
+  })
   password: string;
 }
 
 @InputType()
-export class SignupInput extends SigninInput {
+export class SignupInput extends LoginInput {
   @Field()
   @IsNotEmpty()
   confirmPassword: string;
@@ -55,7 +57,9 @@ export class SignupInput extends SigninInput {
 
   @Field()
   @IsNotEmpty()
-  @MinLength(2, { message: "userName has to be longer than $constraint1 characters" })
+  @MinLength(2, {
+    message: "userName has to be longer than $constraint1 characters",
+  })
   name: string;
 }
 
@@ -66,6 +70,9 @@ export class LoginResponse {
 
   @Field()
   accountId: string;
+
+  @Field()
+  isCompany: boolean;
 }
 
 @InputType()

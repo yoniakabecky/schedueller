@@ -173,7 +173,7 @@ export type MutationSignupArgs = {
 
 
 export type MutationLoginArgs = {
-  data: SigninInput;
+  data: LoginInput;
 };
 
 
@@ -270,6 +270,7 @@ export type LoginResponse = {
   __typename?: 'LoginResponse';
   token: Scalars['String'];
   accountId: Scalars['String'];
+  isCompany: Scalars['Boolean'];
 };
 
 export type SignupInput = {
@@ -280,7 +281,7 @@ export type SignupInput = {
   name: Scalars['String'];
 };
 
-export type SigninInput = {
+export type LoginInput = {
   email: Scalars['String'];
   password: Scalars['String'];
 };
@@ -323,7 +324,7 @@ export type EditUserInput = {
 };
 
 export type LoginMutationVariables = Exact<{
-  data: SigninInput;
+  data: LoginInput;
 }>;
 
 
@@ -331,16 +332,17 @@ export type LoginMutation = (
   { __typename?: 'Mutation' }
   & { login: (
     { __typename?: 'LoginResponse' }
-    & Pick<LoginResponse, 'token' | 'accountId'>
+    & Pick<LoginResponse, 'token' | 'accountId' | 'isCompany'>
   ) }
 );
 
 
 export const LoginDocument = gql`
-    mutation Login($data: SigninInput!) {
+    mutation Login($data: LoginInput!) {
   login(data: $data) {
     token
     accountId
+    isCompany
   }
 }
     `;

@@ -1205,7 +1205,7 @@
                   "name": null,
                   "ofType": {
                     "kind": "INPUT_OBJECT",
-                    "name": "SigninInput",
+                    "name": "LoginInput",
                     "ofType": null
                   }
                 },
@@ -1898,6 +1898,22 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "isCompany",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "inputFields": null,
@@ -1988,7 +2004,7 @@
       },
       {
         "kind": "INPUT_OBJECT",
-        "name": "SigninInput",
+        "name": "LoginInput",
         "description": null,
         "fields": null,
         "inputFields": [

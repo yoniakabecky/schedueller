@@ -3,7 +3,13 @@ import bcrypt from "bcrypt";
 import { ObjectId } from "mongodb";
 import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import { getMongoManager } from "typeorm";
-import { Account, EditAccountInput, LoginResponse, SigninInput, SignupInput } from "../entity/Account";
+import {
+  Account,
+  EditAccountInput,
+  LoginResponse,
+  LoginInput,
+  SignupInput,
+} from "../entity/Account";
 import { Company } from "../entity/Company";
 import { User } from "../entity/User";
 import { createAccessToken } from "../utils/createToken";
@@ -19,8 +25,10 @@ export class AccountResolver {
   @Query(() => Account)
   async getAccount(@Arg("accountId") accountId: string): Promise<Account> {
     try {
-      const account = await Account.findOne({ where: { _id: new ObjectId(accountId) } });
-      if (!account) throw new Error('Account not found');
+      const account = await Account.findOne({
+        where: { _id: new ObjectId(accountId) },
+      });
+      if (!account) throw new Error("Account not found");
 
       return account;
     } catch (error) {
@@ -35,12 +43,11 @@ export class AccountResolver {
     @Arg("data") data: EditAccountInput
   ) {
     try {
-      await getMongoManager()
-        .findOneAndUpdate<Account>(
-          Account,
-          { _id: new ObjectId(accountId) },
-          { $set: { ...data } }
-        );
+      await getMongoManager().findOneAndUpdate<Account>(
+        Account,
+        { _id: new ObjectId(accountId) },
+        { $set: { ...data } }
+      );
     } catch (error) {
       console.error(error);
       return error;
@@ -50,31 +57,25 @@ export class AccountResolver {
   }
 
   @Mutation(() => Boolean)
-  async deleteAccount(
-    @Arg("accountId") accountId: string,
-  ) {
+  async deleteAccount(@Arg("accountId") accountId: string) {
     try {
-      const account = await Account.findOne({ where: { _id: new ObjectId(accountId) } });
-      if (!account) throw new Error('Account not found');
+      const account = await Account.findOne({
+        where: { _id: new ObjectId(accountId) },
+      });
+      if (!account) throw new Error("Account not found");
 
-      await getMongoManager()
-        .findOneAndDelete<Account>(
-          Account,
-          { _id: new ObjectId(accountId) }
-        );
+      await getMongoManager().findOneAndDelete<Account>(Account, {
+        _id: new ObjectId(accountId),
+      });
 
       if (account.isCompany) {
-        await getMongoManager()
-          .findOneAndDelete<Company>(
-            Company,
-            { accountId: new ObjectId(accountId) }
-          );
+        await getMongoManager().findOneAndDelete<Company>(Company, {
+          accountId: new ObjectId(accountId),
+        });
       } else {
-        await getMongoManager()
-          .findOneAndDelete<User>(
-            User,
-            { accountId: new ObjectId(accountId) }
-          );
+        await getMongoManager().findOneAndDelete<User>(User, {
+          accountId: new ObjectId(accountId),
+        });
       }
     } catch (error) {
       console.error(error);
@@ -86,20 +87,22 @@ export class AccountResolver {
 
   @Mutation(() => LoginResponse)
   async signup(
-    @Arg("data") { email, password, confirmPassword, isCompany, name }: SignupInput,
+    @Arg("data")
+    { email, password, confirmPassword, isCompany, name }: SignupInput,
     @Ctx() { res }: MyContext
   ): Promise<LoginResponse> {
     try {
       const isAccountExist = await Account.findOne({ email });
       if (isAccountExist) throw new UserInputError("Email is already in use");
-      if (password !== confirmPassword) throw new UserInputError("Password must be same");
+      if (password !== confirmPassword)
+        throw new UserInputError("Password must be same");
 
       const hashedPassword = await bcrypt.hash(password, 10);
 
       const newAccount = await Account.insert({
         email,
         isCompany,
-        password: hashedPassword
+        password: hashedPassword,
       });
 
       const newAccountId: ObjectId = newAccount.raw.insertedId;
@@ -107,13 +110,13 @@ export class AccountResolver {
       if (isCompany) {
         await Company.insert({
           companyName: name,
-          accountId: newAccountId
-        })
+          accountId: newAccountId,
+        });
       } else {
         await User.insert({
           userName: name,
-          accountId: newAccountId
-        })
+          accountId: newAccountId,
+        });
       }
 
       const token = createAccessToken(newAccountId);
@@ -121,7 +124,8 @@ export class AccountResolver {
 
       return {
         token,
-        accountId: newAccountId.toHexString()
+        accountId: newAccountId.toHexString(),
+        isCompany: isCompany,
       };
     } catch (err) {
       console.error(err);
@@ -131,11 +135,11 @@ export class AccountResolver {
 
   @Mutation(() => LoginResponse)
   async login(
-    @Arg("data") { email, password }: SigninInput,
+    @Arg("data") { email, password }: LoginInput,
     @Ctx() { res }: MyContext
   ): Promise<LoginResponse> {
     const account = await Account.findOne({ email });
-    if (!account) throw new Error('Account not found');
+    if (!account) throw new Error("Account not found");
 
     const isPasswordValid = await bcrypt.compare(password, account.password);
     if (!isPasswordValid) throw new Error("Wrong password");
@@ -145,7 +149,8 @@ export class AccountResolver {
 
     return {
       token,
-      accountId: account.id.toHexString()
+      accountId: account.id.toHexString(),
+      isCompany: account.isCompany,
     };
   }
 }
