@@ -1,14 +1,12 @@
-import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
+import { ApolloProvider } from "@apollo/client";
 import React from "react";
 
+import { useAuthApolloClient } from "./hooks/useAuthApolloClient";
 import Routes from "./Routes";
 
-const client = new ApolloClient({
-  uri: process.env.REACT_APP_BACKEND_ENDPOINT,
-  cache: new InMemoryCache(),
-});
-
 function App() {
+  const client = useAuthApolloClient();
+
   return (
     <ApolloProvider client={client}>
       <Routes />
