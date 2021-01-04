@@ -1,7 +1,15 @@
 import { UserInputError } from "apollo-server-express";
 import bcrypt from "bcrypt";
+import { verify } from "jsonwebtoken";
 import { ObjectId } from "mongodb";
-import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
+import {
+  Arg,
+  Ctx,
+  Mutation,
+  Query,
+  Resolver,
+  UseMiddleware,
+} from "type-graphql";
 import { getMongoManager } from "typeorm";
 import {
   Account,
@@ -12,6 +20,7 @@ import {
 } from "../entity/Account";
 import { Company } from "../entity/Company";
 import { User } from "../entity/User";
+import { authenticated } from "../utils/auth";
 import { createAccessToken } from "../utils/createToken";
 import { MyContext } from "../utils/myContext";
 
@@ -22,11 +31,19 @@ export class AccountResolver {
     return Account.find();
   }
 
-  @Query(() => Account)
-  async getAccount(@Arg("accountId") accountId: string): Promise<Account> {
+  @Query(() => Account, { nullable: true })
+  @UseMiddleware(authenticated)
+  async getMyAccount(@Ctx() context: MyContext): Promise<Account | null> {
+    const authorization = context.req.headers["authorization"];
+
+    if (!authorization) return null;
+
     try {
+      const token = authorization.split(" ")[1];
+      const payload: any = verify(token, process.env.ACCESS_TOKEN_SECRET!);
+
       const account = await Account.findOne({
-        where: { _id: new ObjectId(accountId) },
+        where: { _id: new ObjectId(payload.id) },
       });
       if (!account) throw new Error("Account not found");
 
@@ -122,11 +139,7 @@ export class AccountResolver {
       const token = createAccessToken(newAccountId);
       res.cookie("jwt", token, { httpOnly: true });
 
-      return {
-        token,
-        accountId: newAccountId.toHexString(),
-        isCompany: isCompany,
-      };
+      return { token };
     } catch (err) {
       console.error(err);
       return err;
@@ -135,8 +148,7 @@ export class AccountResolver {
 
   @Mutation(() => LoginResponse)
   async login(
-    @Arg("data") { email, password }: LoginInput,
-    @Ctx() { res }: MyContext
+    @Arg("data") { email, password }: LoginInput
   ): Promise<LoginResponse> {
     const account = await Account.findOne({ email });
     if (!account) throw new Error("Account not found");
@@ -145,12 +157,7 @@ export class AccountResolver {
     if (!isPasswordValid) throw new Error("Wrong password");
 
     const token = createAccessToken(account.id);
-    res.cookie("jwt", token, { httpOnly: true });
 
-    return {
-      token,
-      accountId: account.id.toHexString(),
-      isCompany: account.isCompany,
-    };
+    return { token };
   }
 }

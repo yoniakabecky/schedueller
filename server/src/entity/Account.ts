@@ -67,12 +67,6 @@ export class SignupInput extends LoginInput {
 export class LoginResponse {
   @Field()
   token: string;
-
-  @Field()
-  accountId: string;
-
-  @Field()
-  isCompany: boolean;
 }
 
 @InputType()

@@ -18,7 +18,7 @@ export type Scalars = {
 export type Query = {
   __typename?: 'Query';
   accounts: Array<Account>;
-  getAccount: Account;
+  getMyAccount?: Maybe<Account>;
   companies: Array<Company>;
   getCompany: Company;
   employees: Array<Employee>;
@@ -31,11 +31,6 @@ export type Query = {
   shifts: Array<Shift>;
   users: Array<User>;
   getUser: User;
-};
-
-
-export type QueryGetAccountArgs = {
-  accountId: Scalars['String'];
 };
 
 
@@ -269,8 +264,6 @@ export type EditAccountInput = {
 export type LoginResponse = {
   __typename?: 'LoginResponse';
   token: Scalars['String'];
-  accountId: Scalars['String'];
-  isCompany: Scalars['Boolean'];
 };
 
 export type SignupInput = {
@@ -332,7 +325,7 @@ export type LoginMutation = (
   { __typename?: 'Mutation' }
   & { login: (
     { __typename?: 'LoginResponse' }
-    & Pick<LoginResponse, 'token' | 'accountId' | 'isCompany'>
+    & Pick<LoginResponse, 'token'>
   ) }
 );
 
@@ -341,8 +334,6 @@ export const LoginDocument = gql`
     mutation Login($data: LoginInput!) {
   login(data: $data) {
     token
-    accountId
-    isCompany
   }
 }
     `;
