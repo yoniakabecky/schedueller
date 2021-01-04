@@ -15,11 +15,15 @@ export class Company extends BaseEntity {
 
   @Field()
   @Column()
+  displayName: string;
+
+  @Field()
+  @Column()
   companyName: string;
 
   @Field({ nullable: true })
   @Column()
-  companyImage: string;
+  profileImage: string;
 }
 
 @InputType()
@@ -28,5 +32,8 @@ export class EditCompanyInput {
   companyName: string;
 
   @Field({ nullable: true })
-  companyImage: string;
+  displayName: string;
+
+  @Field({ nullable: true })
+  profileImage: string;
 }

@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import { IsBoolean, IsEmail, IsNotEmpty, MinLength } from "class-validator";
 import { Field, ID, InputType, ObjectType } from "type-graphql";
-import { BaseEntity, Column, Entity, ObjectIdColumn } from "typeorm";
+import { BaseEntity, Column, Entity, Index, ObjectIdColumn } from "typeorm";
 
 @ObjectType()
 @Entity("accounts")
@@ -12,6 +12,7 @@ export class Account extends BaseEntity {
 
   @Field()
   @Column()
+  @Index({ unique: true })
   email: string;
 
   @Column()
@@ -58,9 +59,9 @@ export class SignupInput extends LoginInput {
   @Field()
   @IsNotEmpty()
   @MinLength(2, {
-    message: "userName has to be longer than $constraint1 characters",
+    message: "displayName has to be longer than $constraint1 characters",
   })
-  name: string;
+  displayName: string;
 }
 
 @ObjectType()

@@ -105,7 +105,7 @@ export class AccountResolver {
   @Mutation(() => LoginResponse)
   async signup(
     @Arg("data")
-    { email, password, confirmPassword, isCompany, name }: SignupInput,
+    { email, password, confirmPassword, isCompany, displayName }: SignupInput,
     @Ctx() { res }: MyContext
   ): Promise<LoginResponse> {
     try {
@@ -126,12 +126,12 @@ export class AccountResolver {
 
       if (isCompany) {
         await Company.insert({
-          companyName: name,
+          displayName,
           accountId: newAccountId,
         });
       } else {
         await User.insert({
-          userName: name,
+          displayName,
           accountId: newAccountId,
         });
       }

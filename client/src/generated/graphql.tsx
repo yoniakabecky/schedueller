@@ -76,8 +76,9 @@ export type Company = {
   __typename?: 'Company';
   id: Scalars['ID'];
   accountId: Scalars['ID'];
+  displayName: Scalars['String'];
   companyName: Scalars['String'];
-  companyImage?: Maybe<Scalars['String']>;
+  profileImage?: Maybe<Scalars['String']>;
 };
 
 export type Employee = {
@@ -121,7 +122,7 @@ export type User = {
   __typename?: 'User';
   id: Scalars['ID'];
   accountId: Scalars['ID'];
-  userName: Scalars['String'];
+  displayName: Scalars['String'];
   firstName?: Maybe<Scalars['String']>;
   lastName?: Maybe<Scalars['String']>;
   profileImage?: Maybe<Scalars['String']>;
@@ -281,7 +282,8 @@ export type LoginInput = {
 
 export type EditCompanyInput = {
   companyName?: Maybe<Scalars['String']>;
-  companyImage?: Maybe<Scalars['String']>;
+  displayName?: Maybe<Scalars['String']>;
+  profileImage?: Maybe<Scalars['String']>;
 };
 
 export type EmployeeInput = {
@@ -310,7 +312,7 @@ export type EditShiftInput = {
 };
 
 export type EditUserInput = {
-  userName?: Maybe<Scalars['String']>;
+  displayName?: Maybe<Scalars['String']>;
   firstName?: Maybe<Scalars['String']>;
   lastName?: Maybe<Scalars['String']>;
   profileImage?: Maybe<Scalars['String']>;
