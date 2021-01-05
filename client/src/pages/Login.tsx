@@ -1,5 +1,6 @@
 import { useMutation } from "@apollo/client";
 import React, { ReactElement } from "react";
+import { useHistory } from "react-router-dom";
 import { LOGIN } from "../graphql/mutations";
 import { useAuthToken } from "../hooks/useAuthToken";
 import { LoginInput, LoginResponse } from "../types/auth";
@@ -10,10 +11,12 @@ export default function Login(props: Props): ReactElement {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [, setAuthToken] = useAuthToken();
+  const history = useHistory();
 
   const [login, { error }] = useMutation<LoginResponse, LoginInput>(LOGIN, {
     update: (cache, { data }) => {
       setAuthToken(data!.login.token);
+      history.push("/dashboard");
     },
   });
 
