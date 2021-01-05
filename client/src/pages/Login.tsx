@@ -1,28 +1,21 @@
 import { useMutation } from "@apollo/client";
 import React, { ReactElement } from "react";
 import { LOGIN } from "../graphql/mutations";
+import { useAuthToken } from "../hooks/useAuthToken";
+import { LoginInput, LoginResponse } from "../types/auth";
 
 interface Props {}
-
-type LoginInput = {
-  data: {
-    email: string;
-    password: string;
-  };
-};
-
-type LoginResponse = {
-  token: string;
-  isCompany: boolean;
-};
 
 export default function Login(props: Props): ReactElement {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [, setAuthToken] = useAuthToken();
 
-  const [login, { loading, error }] = useMutation<LoginResponse, LoginInput>(
-    LOGIN
-  );
+  const [login, { error }] = useMutation<LoginResponse, LoginInput>(LOGIN, {
+    update: (cache, { data }) => {
+      setAuthToken(data!.login.token);
+    },
+  });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
