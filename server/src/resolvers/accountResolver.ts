@@ -31,9 +31,11 @@ export class AccountResolver {
     return Account.find();
   }
 
-  @Query(() => Account, { nullable: true })
+  @Query(() => User || Company, { nullable: true })
   @UseMiddleware(authenticated)
-  async getMyAccount(@Ctx() context: MyContext): Promise<Account | null> {
+  async getMyAccount(
+    @Ctx() context: MyContext
+  ): Promise<User | Company | null> {
     const authorization = context.req.headers["authorization"];
 
     if (!authorization) return null;
@@ -47,7 +49,12 @@ export class AccountResolver {
       });
       if (!account) throw new Error("Account not found");
 
-      return account;
+      const me = account.isCompany
+        ? await Company.findOne({ accountId: account.id })
+        : await User.findOne({ accountId: account.id });
+      if (!me) throw new Error("My Account Not found");
+
+      return me;
     } catch (error) {
       console.error(error);
       return error;
@@ -105,8 +112,7 @@ export class AccountResolver {
   @Mutation(() => LoginResponse)
   async signup(
     @Arg("data")
-    { email, password, confirmPassword, isCompany, displayName }: SignupInput,
-    @Ctx() { res }: MyContext
+    { email, password, confirmPassword, isCompany, displayName }: SignupInput
   ): Promise<LoginResponse> {
     try {
       const isAccountExist = await Account.findOne({ email });
@@ -137,9 +143,11 @@ export class AccountResolver {
       }
 
       const token = createAccessToken(newAccountId);
-      res.cookie("jwt", token, { httpOnly: true });
 
-      return { token };
+      return {
+        token,
+        isCompany,
+      };
     } catch (err) {
       console.error(err);
       return err;
@@ -158,6 +166,9 @@ export class AccountResolver {
 
     const token = createAccessToken(account.id);
 
-    return { token };
+    return {
+      token,
+      isCompany: account.isCompany,
+    };
   }
 }

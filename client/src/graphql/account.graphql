@@ -6,5 +6,15 @@ input LoginInput {
 mutation Login($data: LoginInput!) {
   login(data: $data) {
     token
+    isCompany
+  }
+}
+
+query GetMyAccount {
+  getMyAccount {
+    id
+    accountId
+    displayName
+    profileImage
   }
 }

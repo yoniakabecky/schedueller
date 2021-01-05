@@ -18,7 +18,7 @@ export type Scalars = {
 export type Query = {
   __typename?: 'Query';
   accounts: Array<Account>;
-  getMyAccount?: Maybe<Account>;
+  getMyAccount?: Maybe<User>;
   companies: Array<Company>;
   getCompany: Company;
   employees: Array<Employee>;
@@ -72,6 +72,16 @@ export type Account = {
   providerId?: Maybe<Scalars['String']>;
 };
 
+export type User = {
+  __typename?: 'User';
+  id: Scalars['ID'];
+  accountId: Scalars['ID'];
+  displayName: Scalars['String'];
+  firstName?: Maybe<Scalars['String']>;
+  lastName?: Maybe<Scalars['String']>;
+  profileImage?: Maybe<Scalars['String']>;
+};
+
 export type Company = {
   __typename?: 'Company';
   id: Scalars['ID'];
@@ -117,16 +127,6 @@ export type Shift = {
   note?: Maybe<Scalars['String']>;
 };
 
-
-export type User = {
-  __typename?: 'User';
-  id: Scalars['ID'];
-  accountId: Scalars['ID'];
-  displayName: Scalars['String'];
-  firstName?: Maybe<Scalars['String']>;
-  lastName?: Maybe<Scalars['String']>;
-  profileImage?: Maybe<Scalars['String']>;
-};
 
 export type Mutation = {
   __typename?: 'Mutation';
@@ -265,6 +265,7 @@ export type EditAccountInput = {
 export type LoginResponse = {
   __typename?: 'LoginResponse';
   token: Scalars['String'];
+  isCompany: Scalars['Boolean'];
 };
 
 export type SignupInput = {
@@ -272,7 +273,7 @@ export type SignupInput = {
   password: Scalars['String'];
   confirmPassword: Scalars['String'];
   isCompany: Scalars['Boolean'];
-  name: Scalars['String'];
+  displayName: Scalars['String'];
 };
 
 export type LoginInput = {
@@ -327,8 +328,19 @@ export type LoginMutation = (
   { __typename?: 'Mutation' }
   & { login: (
     { __typename?: 'LoginResponse' }
-    & Pick<LoginResponse, 'token'>
+    & Pick<LoginResponse, 'token' | 'isCompany'>
   ) }
+);
+
+export type GetMyAccountQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetMyAccountQuery = (
+  { __typename?: 'Query' }
+  & { getMyAccount?: Maybe<(
+    { __typename?: 'User' }
+    & Pick<User, 'id' | 'accountId' | 'displayName' | 'profileImage'>
+  )> }
 );
 
 
@@ -336,6 +348,7 @@ export const LoginDocument = gql`
     mutation Login($data: LoginInput!) {
   login(data: $data) {
     token
+    isCompany
   }
 }
     `;
@@ -364,3 +377,38 @@ export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginM
 export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
 export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
 export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
+export const GetMyAccountDocument = gql`
+    query GetMyAccount {
+  getMyAccount {
+    id
+    accountId
+    displayName
+    profileImage
+  }
+}
+    `;
+
+/**
+ * __useGetMyAccountQuery__
+ *
+ * To run a query within a React component, call `useGetMyAccountQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetMyAccountQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetMyAccountQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetMyAccountQuery(baseOptions?: Apollo.QueryHookOptions<GetMyAccountQuery, GetMyAccountQueryVariables>) {
+        return Apollo.useQuery<GetMyAccountQuery, GetMyAccountQueryVariables>(GetMyAccountDocument, baseOptions);
+      }
+export function useGetMyAccountLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetMyAccountQuery, GetMyAccountQueryVariables>) {
+          return Apollo.useLazyQuery<GetMyAccountQuery, GetMyAccountQueryVariables>(GetMyAccountDocument, baseOptions);
+        }
+export type GetMyAccountQueryHookResult = ReturnType<typeof useGetMyAccountQuery>;
+export type GetMyAccountLazyQueryHookResult = ReturnType<typeof useGetMyAccountLazyQuery>;
+export type GetMyAccountQueryResult = Apollo.QueryResult<GetMyAccountQuery, GetMyAccountQueryVariables>;
