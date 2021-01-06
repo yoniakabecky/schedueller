@@ -15,7 +15,7 @@ export class User extends BaseEntity {
 
   @Field()
   @Column()
-  userName: string;
+  displayName: string;
 
   @Field({ nullable: true })
   @Column()
@@ -33,7 +33,7 @@ export class User extends BaseEntity {
 @InputType()
 export class EditUserInput {
   @Field({ nullable: true })
-  userName: string;
+  displayName: string;
 
   @Field({ nullable: true })
   firstName: string;
