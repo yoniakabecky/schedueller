@@ -8,3 +8,12 @@ export const LOGIN = gql`
     }
   }
 `;
+
+export const SIGNUP = gql`
+  mutation signup($data: SignupInput!) {
+    signup(data: $data) {
+      token
+      isCompany
+    }
+  }
+`;
